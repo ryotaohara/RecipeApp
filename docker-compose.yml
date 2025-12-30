@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # 1. The Data Tier
+  db:
+    build: ./database
+    container_name: recipe-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: recipe_db
+  ports:
+      - "5432:5432"
+
+  # 2. The Database UI (pgAdmin)
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: recipe-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+
+  # # 3. The Logic Tier (Backend)
+  # backend:
+  #   build: ./backend
+  #   container_name: recipe-backend
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     DATABASE_URL: postgresql://user:password@db:5432/recipe_db
+  #   depends_on:
+  #     - db
+
+  # # 4. The Presentation Tier
+  # frontend:
+  #   build: ./frontend
+  #   container_name: recipe-frontend
+  #   ports:
+  #     - "5173:5173"
+  #   environment:
+  #     - VITE_API_URL=http://localhost:8000
+  #   depends_on:
+  #     - backend
