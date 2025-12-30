@@ -1,17 +1,16 @@
 import os
-from typing import List
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 # Import our local database modules
 import models
-from database import engine, get_db
-from pydantic import BaseModel
+import schemas
+from databases import engine, get_db
 
 # Initialize Database tables
 # In the V-Model, this ensures the Physical Schema matches our Design
-models.Base.metadata.create_all(bind=engine)
+models.Base.metadata.create_all(bind=engine) # Specified tables are created
 
 app = FastAPI(title="Recipe Engine API")
 
@@ -25,19 +24,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- Pydantic Schemas (The "Contract") ---
-from pydantic import BaseModel
-
-class IngredientItem(BaseModel):
-    ingredient_id: int
-    quantity: float
-
-class RecipeSubmission(BaseModel):
-    title: str
-    prep_time: int
-    cook_time: int
-    ingredients: List[IngredientItem]
-
 # --- API Endpoints ---
 
 @app.get("/ingredients")
@@ -45,8 +31,8 @@ def read_ingredients(db: Session = Depends(get_db)):
     """Requirement: Frontend needs a list of ingredients for the dropdown."""
     return db.query(models.Ingredient).all()
 
-@app.post("/recipes/calculate")
-async def calculate_and_save_recipe(submission: RecipeSubmission, db: Session = Depends(get_db)):
+@app.post("/recipes/calculate", response_model=schemas.CalculationResponse)
+async def calculate_and_save_recipe(submission: schemas.RecipeSubmission, db: Session = Depends(get_db)):
     # 1. Logic Phase: Perform Calculations
     total_calories = 0.0
     total_price = 0.0
