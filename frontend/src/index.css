@@ -2,58 +2,122 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 1. Global Resets & Variables */
-:root {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light;
-  background-color: #f8fafc; /* Slate-50 background */
-  color: #1e293b; /* Slate-800 text */
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* 2. Custom Base Styles */
 body {
   margin: 0;
+  padding: 0;
+  background-color: #f1f5f9; /* Soft gray background */
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.app-container {
+  max-width: 800px;
+  min-height: 500px;
+  margin: 60px auto; /* 60px Space at the top, 'auto' centers it */
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+  overflow: hidden; /* Clips the navbar to rounded corners */
+}
+
+.navbar {
   display: flex;
-  place-content: center;
-  min-width: 320px;
-  min-height: 100vh;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-/* 3. V-Model UI Animations */
-/* This makes the "Results" section slide in smoothly when the math is ready */
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(1.5rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 800;
+  color: #2563eb; /* Blue-600 */
 }
 
-.animate-in {
-  animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
 }
 
-/* 4. Form Styling Overrides */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+.nav-links button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: #94a3b8;
+  transition: all 0.2s;
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
-/* Utility class for card containers */
-.card-glass {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+.nav-links button.active {
+  color: #2563eb;
+}
+
+/* 4. Content Area Styling */
+.content-area {
+  padding: 2rem;
+}
+
+/* Add to your existing index.css */
+
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-group label, .ingredients-section label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+input, select {
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.primary-btn {
+  background: #2563eb;
+  color: white;
+  padding: 1rem;
+  border-radius: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}
+
+.secondary-btn {
+  background: none;
+  border: 2px dashed #e2e8f0;
+  color: #94a3b8;
+  padding: 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.items {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid #f1f5f9;
 }

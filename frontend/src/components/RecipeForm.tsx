@@ -1,156 +1,158 @@
 import React, { useState, useEffect } from 'react';
-import { api } from '../services/api';
-import { RecipeData, IngredientOption } from '../types.ts';
-import { Plus, Trash2, Save } from 'lucide-react';
+import { Plus, Trash2, Save, Clock } from 'lucide-react';
 
-interface RecipeFormProps {
-  onSubmitSuccess: (data: any) => void;
+interface IngredientOption {
+  id: number;
+  name: string;
 }
 
-export const RecipeForm: React.FC<RecipeFormProps> = ({ onSubmitSuccess }) => {
-  // 1. State Management
+export const RecipeForm = ({ onSaved }: { onSaved: (data: any) => void }) => {
   const [availableIngredients, setAvailableIngredients] = useState<IngredientOption[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState<RecipeData>({
-    title: '',
-    servings: 1,
-    prep_time: 0,
-    cook_time: 0,
-    instructions: '',
-    ingredients: []
-  });
+  const [rows, setRows] = useState([{ ingredient_id: 0, quantity: 0 }]);
+  const [title, setTitle] = useState('');
+  const [prepTime, setPrepTime] = useState(10);
+  const [cookTime, setCookTime] = useState(20);
 
-  // 2. Load Ingredients from Backend on Mount
   useEffect(() => {
-    const loadData = async () => {
-      const data = await api.getIngredients();
-      setAvailableIngredients(data);
-      setLoading(false);
-    };
-    loadData();
+    fetch('http://localhost:8000/ingredients')
+      .then(res => res.json())
+      .then(setAvailableIngredients)
+      .catch(err => console.error("Could not load ingredients", err));
   }, []);
-
-  // 3. Form Handlers
-  const addIngredientRow = () => {
-    setFormData({
-      ...formData,
-      ingredients: [...formData.ingredients, { ingredient_id: '', quantity: 0 }]
-    });
-  };
-
-  const removeIngredientRow = (index: number) => {
-    const newIngs = formData.ingredients.filter((_, i) => i !== index);
-    setFormData({ ...formData, ingredients: newIngs });
-  };
-
-  const handleIngredientChange = (index: number, field: string, value: string) => {
-    const newIngs = [...formData.ingredients];
-    if (field === 'ingredient_id') {
-      // Convert to number for Postgres/FastAPI compatibility
-      newIngs[index].ingredient_id = parseInt(value);
-    } else {
-      newIngs[index].quantity = parseFloat(value) || 0;
-    }
-    setFormData({ ...formData, ingredients: newIngs });
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.ingredients.length === 0) {
-      alert("Please add at least one ingredient");
+    const validIngredients = rows.filter(r => r.ingredient_id > 0 && r.quantity > 0);
+    
+    if (!title || validIngredients.length === 0) {
+      alert("Please provide a title and at least one ingredient.");
       return;
     }
-    
+
+    const payload = {
+      title,
+      prep_time: prepTime,
+      cook_time: cookTime,
+      ingredients: validIngredients
+    };
+
     try {
-      const result = await api.saveRecipe(formData);
-      onSubmitSuccess(result);
+      const res = await fetch('http://localhost:8000/recipes/calculate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      if (res.ok) {
+        onSaved(await res.json());
+      } else {
+        alert("Backend error. Check your terminal.");
+      }
     } catch (err) {
-      console.error("Submission failed", err);
-      alert("Error saving recipe. Check backend connection.");
+      alert("Connection failed. Is the backend running?");
     }
   };
 
-  if (loading) return <div className="p-10 text-center">Connecting to Logic Tier...</div>;
-
   return (
-    <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-100">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="space-y-2">
-          <label className="text-sm font-bold text-slate-700 uppercase">Recipe Title</label>
-          <input 
-            required
-            className="w-full border-2 border-slate-100 p-3 rounded-xl focus:border-blue-500 outline-none transition"
-            placeholder="e.g. Grandma's Chicken Pasta"
-            value={formData.title}
-            onChange={e => setFormData({...formData, title: e.target.value})}
-          />
-        </div>
+    <form onSubmit={handleSubmit} className="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 space-y-6">
+      {/* Title Section */}
+      <div className="space-y-1">
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Recipe Title</label>
+        <input 
+          className="w-full text-2xl font-bold border-b-2 border-slate-100 focus:border-blue-500 outline-none pb-2 transition-colors"
+          placeholder="e.g. Spicy Chicken Alfredo" 
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+        />
+      </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-700 uppercase">Prep Time (min)</label>
+      {/* Time Grid */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Prep Time (Min)</label>
+          <div className="relative">
+            <Clock className="absolute left-3 top-3 text-slate-300" size={18} />
             <input 
-              type="number" required
-              className="w-full border-2 border-slate-100 p-3 rounded-xl focus:border-blue-500 outline-none"
-              onChange={e => setFormData({...formData, prep_time: parseInt(e.target.value)})}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-700 uppercase">Cook Time (min)</label>
-            <input 
-              type="number" required
-              className="w-full border-2 border-slate-100 p-3 rounded-xl focus:border-blue-500 outline-none"
-              onChange={e => setFormData({...formData, cook_time: parseInt(e.target.value)})}
+              type="number" 
+              className="w-full bg-slate-50 p-3 pl-10 rounded-xl outline-none focus:ring-2 ring-blue-100 transition"
+              value={prepTime}
+              onChange={e => setPrepTime(parseInt(e.target.value) || 0)}
             />
           </div>
         </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Cook Time (Min)</label>
+          <div className="relative">
+            <Clock className="absolute left-3 top-3 text-slate-300" size={18} />
+            <input 
+              type="number" 
+              className="w-full bg-slate-50 p-3 pl-10 rounded-xl outline-none focus:ring-2 ring-blue-100 transition"
+              value={cookTime}
+              onChange={e => setCookTime(parseInt(e.target.value) || 0)}
+            />
+          </div>
+        </div>
+      </div>
 
-        <div className="space-y-4 pt-4 border-t border-slate-50">
-          <div className="flex justify-between items-center">
-            <label className="text-sm font-bold text-slate-700 uppercase">Ingredients Mapping</label>
-            <button 
-              type="button" onClick={addIngredientRow}
-              className="flex items-center gap-1 text-xs font-bold bg-blue-50 text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-100 transition"
+      {/* Ingredients Section */}
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ingredients</label>
+        </div>
+        
+        {rows.map((row, i) => (
+          <div key={i} className="flex gap-3 items-center animate-in">
+            <select 
+              className="flex-grow bg-slate-50 p-3 rounded-xl outline-none focus:ring-2 ring-blue-100 transition"
+              value={row.ingredient_id}
+              onChange={e => {
+                const newRows = [...rows];
+                newRows[i].ingredient_id = parseInt(e.target.value);
+                setRows(newRows);
+              }}
             >
-              <Plus size={14} /> Add Row
-            </button>
-          </div>
-
-          {formData.ingredients.map((item, index) => (
-            <div key={index} className="flex gap-3 animate-in fade-in slide-in-from-left-2 duration-300">
-              <select 
-                required
-                className="flex-grow border-2 border-slate-100 p-3 rounded-xl focus:border-blue-500 outline-none bg-white"
-                onChange={e => handleIngredientChange(index, 'ingredient_id', e.target.value)}
-              >
-                <option value="">Select Ingredient</option>
-                {availableIngredients.map(ing => (
-                  <option key={ing.id} value={ing.id}>{ing.name}</option>
-                ))}
-              </select>
-              <input 
-                type="number" required
-                className="w-28 border-2 border-slate-100 p-3 rounded-xl focus:border-blue-500 outline-none"
-                placeholder="Grams"
-                onChange={e => handleIngredientChange(index, 'quantity', e.target.value)}
-              />
+              <option value="0">Choose Ingredient...</option>
+              {availableIngredients.map(ing => (
+                <option key={ing.id} value={ing.id}>{ing.name}</option>
+              ))}
+            </select>
+            <input 
+              type="number" 
+              placeholder="Grams"
+              className="w-28 bg-slate-50 p-3 rounded-xl outline-none focus:ring-2 ring-blue-100 transition"
+              onChange={e => {
+                const newRows = [...rows];
+                newRows[i].quantity = parseFloat(e.target.value) || 0;
+                setRows(newRows);
+              }}
+            />
+            {rows.length > 1 && (
               <button 
-                type="button" onClick={() => removeIngredientRow(index)}
-                className="text-slate-300 hover:text-red-500 p-2 transition"
+                type="button" 
+                onClick={() => setRows(rows.filter((_, idx) => idx !== i))}
+                className="text-slate-300 hover:text-red-500 transition-colors"
               >
                 <Trash2 size={20} />
               </button>
-            </div>
-          ))}
-        </div>
-
+            )}
+          </div>
+        ))}
+        
         <button 
-          type="submit" 
-          className="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2"
+          type="button" 
+          onClick={() => setRows([...rows, { ingredient_id: 0, quantity: 0 }])}
+          className="w-full py-3 border-2 border-dashed border-slate-100 text-slate-400 rounded-xl hover:bg-slate-50 hover:border-slate-200 transition-all font-bold text-sm flex items-center justify-center gap-2"
         >
-          <Save size={20} /> Calculate & Save
+          <Plus size={16} /> Add Ingredient
         </button>
-      </form>
-    </div>
+      </div>
+
+      <button 
+        type="submit" 
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2"
+      >
+        <Save size={20} /> Save & Calculate
+      </button>
+    </form>
   );
 };

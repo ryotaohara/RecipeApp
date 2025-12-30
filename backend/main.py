@@ -26,34 +26,39 @@ app.add_middleware(
 
 # --- API Endpoints ---
 
+# Returns a list of ingredients for the dropdown on the frontend
 @app.get("/ingredients")
 def read_ingredients(db: Session = Depends(get_db)):
-    """Requirement: Frontend needs a list of ingredients for the dropdown."""
-    return db.query(models.Ingredient).all()
+    return db.query(models.Ingredient).all() # SELECT * from "ingredients"
 
+# Returns all recipes
+@app.get("/recipes")
+def list_recipes(db: Session = Depends(get_db)):
+    return db.query(models.Recipe).all()
+
+# Inserts a new recipe with the frontend inputs
 @app.post("/recipes/calculate", response_model=schemas.CalculationResponse)
-async def calculate_and_save_recipe(submission: schemas.RecipeSubmission, db: Session = Depends(get_db)):
-    # 1. Logic Phase: Perform Calculations
-    total_calories = 0.0
-    total_price = 0.0
-    
-    # 2. Database Phase: Create the Recipe Record
+async def calculate_and_save_recipe(submission: schemas.RecipeIngredient, db: Session = Depends(get_db)):
+    # 1. Database Phase: Create the Recipe Record
     new_recipe = models.Recipe(
-        title=submission.title,
-        prep_time=submission.prep_time,
-        cook_time=submission.cook_time
+        title     = submission.title,
+        prep_time = submission.prep_time,
+        cook_time = submission.cook_time
     )
-    db.add(new_recipe)
+    db.add(new_recipe) # INSERT into the "recipes" table
     db.flush()  # This gets us the new_recipe.id without committing yet
 
-    # 3. Database Phase: Map Ingredients and Calculate
+    # 2. Logic Phase: Perform Calculations
+    total_calories = 0.0
+    total_price = 0.0
+
     for item in submission.ingredients:
         db_ing = db.query(models.Ingredient).filter(models.Ingredient.id == item.ingredient_id).first()
         if not db_ing:
             raise HTTPException(status_code=404, detail=f"Ingredient {item.ingredient_id} not found")
             
         total_calories += item.quantity * db_ing.calories_per_g
-        total_price += item.quantity * db_ing.price_per_g
+        total_price    += item.quantity * db_ing.price_per_g
 
         # Link ingredient to the new recipe
         recipe_link = models.RecipeIngredient(
@@ -61,9 +66,9 @@ async def calculate_and_save_recipe(submission: schemas.RecipeSubmission, db: Se
             ingredient_id=item.ingredient_id,
             quantity=item.quantity
         )
-        db.add(recipe_link)
+        db.add(recipe_link) # INSERT into the "recipe_ingredients" table
 
-    # 4. Finalize
+    # 3. Commit the query
     db.commit() # Save everything to PostgreSQL
     
     return {
@@ -72,6 +77,17 @@ async def calculate_and_save_recipe(submission: schemas.RecipeSubmission, db: Se
         "price": round(total_price, 2),
         "time": submission.prep_time + submission.cook_time
     }
+
+# Adds an ingredient
+@app.post("/add_ingredients")
+async def add_ingredient(item: schemas.Ingredient, db: Session = Depends(get_db)):
+    new_ing  = models.Ingredient(
+        name  = item.name,
+        calories_per_g = item.calories_per_g,
+        price_per_g = item.price_per_g
+    )
+    db.add(new_ing)
+    db.commit()
 
 @app.get("/health")
 def health_check():

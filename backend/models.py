@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
-from database import Base
+from databases import Base
 
 class Ingredient(Base):
     __tablename__ = "ingredients"
@@ -17,7 +17,6 @@ class Recipe(Base):
 
 class RecipeIngredient(Base):
     __tablename__ = "recipe_ingredients"
-    # Composite Primary Key (Requirement: An ingredient appears once per recipe)
-    recipe_id     = Column(Integer, ForeignKey("recipes.id"), primary_key=True)
-    ingredient_id = Column(Integer, ForeignKey("ingredients.id"), primary_key=True)
+    recipe_id     = Column(Integer, ForeignKey("recipes.id"), primary_key=True)     # Composite primary key
+    ingredient_id = Column(Integer, ForeignKey("ingredients.id"), primary_key=True) # Composite primary key
     quantity      = Column(Float, nullable=False)

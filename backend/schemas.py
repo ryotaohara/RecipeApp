@@ -1,15 +1,16 @@
 from pydantic import BaseModel, Field
 from typing import List
 
-class IngredientItem(BaseModel):
-    ingredient_id: int = Field(..., description="The ID of the ingredient from the database")
-    quantity: float = Field(..., gt=0, description="Quantity in grams, must be greater than 0")
+class Ingredient(BaseModel):
+    name: str = Field(..., min_length=1, max_length=255)
+    calories_per_g: float
+    price_per_g: float
 
-class RecipeSubmission(BaseModel):
+class RecipeIngredient(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
     prep_time: int = Field(..., ge=0)
     cook_time: int = Field(..., ge=0)
-    ingredients: List[IngredientItem]
+    ingredients: List[Ingredient]
 
 class CalculationResponse(BaseModel):
     id: int
