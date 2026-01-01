@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 
 export const IngredientForm = () => {
   const [name, setName] = useState('');
-  const [calories, setCalories] = useState('');
+  const [description, setDescription] = useState('');
+	const [calories, setCalories] = useState('');
   const [price, setPrice] = useState('');
-  const [loading, setLoading] = useState(false);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setLoading(true);
 
     const payload = {
       name: name,
+			description: description,
       calories_per_g: parseFloat(calories),
       price_per_g: parseFloat(price)
     };
@@ -27,6 +27,7 @@ export const IngredientForm = () => {
 			alert("Ingredient added successfully!");
 			// Clear the form
 			setName('');
+			setDescription('');
 			setCalories('');
 			setPrice('');
 		} else {
@@ -35,8 +36,6 @@ export const IngredientForm = () => {
 	} catch (error) {
 		console.error("Error saving ingredient:", error);
 		alert("Could not connect to the backend.");
-	} finally {
-		setLoading(false);
 	}
 };
 
@@ -50,29 +49,35 @@ export const IngredientForm = () => {
 					placeholder="e.g. Avocado" required
 				/>
       </div>
+      <div className="input-group">
+        <label>Description</label>
+        <input
+					value={description}
+					onChange={e => setDescription(e.target.value)}
+					placeholder="Description"
+				/>
+      </div>
       <div className="row">
-        <div className="input-group flex-1">
+        <div className="input-group-flex">
           <label>Calories per 100g</label>
           <input
 						type="number"
-						step="0.01"
 						value={calories}
 						onChange={e => setCalories(e.target.value)}
-						placeholder="0.00" required
+						placeholder="0" required
 					/>
         </div>
-        <div className="input-group flex-1">
+        <div className="input-group-flex">
           <label>Price per 100g</label>
           <input
 						type="number"
-						step="0.01"
 						value={price}
 						onChange={e => setPrice(e.target.value)}
-						placeholder="0.00" required
+						placeholder="0" required
 					/>
         </div>
       </div>
-      <button type="submit" className="primary-btn">Add to Ingredient List</button>
+      <button type="submit" className="add-btn">Add to Ingredient List</button>
     </form>
   );
 };

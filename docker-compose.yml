@@ -11,8 +11,6 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: recipe_db
-  ports:
-      - "5432:5432"
 
   # 2. The Database UI (pgAdmin)
   pgadmin:

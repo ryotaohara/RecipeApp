@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 body {
   margin: 0;
   padding: 0;
@@ -11,8 +7,8 @@ body {
 
 .app-container {
   max-width: 800px;
-  min-height: 500px;
-  margin: 60px auto; /* 60px Space at the top, 'auto' centers it */
+  min-height: 400px;
+  margin: 30px auto; /* 60px Space at the top, 'auto' centers it */
   background: white;
   border-radius: 20px;
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
@@ -30,23 +26,23 @@ body {
 .nav-logo {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
+  font-size: 20px;
   font-weight: 800;
   color: #2563eb; /* Blue-600 */
 }
 
 .nav-links {
   display: flex;
-  gap: 1.5rem;
+  gap: 16px;
 }
 
 .nav-links button {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
   font-weight: 600;
   color: #94a3b8;
-  transition: all 0.2s;
   border: none;
   background: none;
   cursor: pointer;
@@ -56,68 +52,86 @@ body {
   color: #2563eb;
 }
 
-/* 4. Content Area Styling */
-.content-area {
-  padding: 2rem;
-}
-
-/* Add to your existing index.css */
-
 .form-stack {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 16px;
+  padding: 16px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 30px;
+  margin-right: 30px;
 }
 
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 8px;
 }
-
-.input-group label, .ingredients-section label {
-  font-size: 0.8rem;
+.input-group-flex {
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+  flex: 1;
+}
+.input-group-ing {
+  display: flex;
+  gap: 16px;
+}
+.input-group-ing-flex {
+  flex-grow: 1;
+}
+.input-group label, .input-group-flex label{
+  font-size: 12px;
   font-weight: 700;
   color: #64748b;
-  text-transform: uppercase;
-}
-
-input, select {
-  padding: 0.75rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #f8fafc;
 }
 
 .row {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: 16px;
 }
 
-.primary-btn {
+.add-btn {
   background: #2563eb;
   color: white;
-  padding: 1rem;
-  border-radius: 12px;
+  margin-top: 8px;
+  padding: 16px;
+  border-radius: 8px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+}
+.add-btn:hover {
+  background: #2852c0;
+}
+
+.add-btn-ing {
+  padding: 8px;
+  border-radius: 8px;
   font-weight: 700;
   border: none;
   cursor: pointer;
 }
 
-.secondary-btn {
-  background: none;
-  border: 2px dashed #e2e8f0;
-  color: #94a3b8;
-  padding: 0.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  width: 100%;
-}
-
 .items {
   display: flex;
   justify-content: space-between;
-  padding: 1rem;
+  padding: 8px;
   border-bottom: 1px solid #f1f5f9;
+}
+
+input, select {
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+textarea {
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
 }

@@ -22,3 +22,30 @@ export interface CalculationTotals {
   price: number;
   time: number;
 }
+
+export interface Ingredient {
+  id: number;
+  name: string;
+  description: string;
+  calories_per_g: number;
+  price_per_g: number;
+}
+
+export interface Recipe {
+  id: number;
+  title: string;
+  prep_time: number;
+  cook_time: number;
+  calories?: number;
+  price?: number;
+}
+
+export interface RecipeSubmission {
+  title: string;
+  prep_time: number;
+  cook_time: number;
+  ingredients: {
+    ingredient_id: number;
+    quantity: number;
+  }[];
+}
