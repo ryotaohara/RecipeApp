@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { RecipeForm } from './components/RecipeForm';
 import { IngredientForm } from './components/IngredientForm';
 import { RecipeList } from './components/RecipeList';
@@ -6,7 +6,7 @@ import { IngredientList } from './components/IngredientList';
 import { Utensils, BookOpen, ChefHat } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'recipe' | 'ingredient' | 'RecipeList'>('recipe');
+  const [activeTab, setActiveTab] = useState<'RecipeForm'|'IngredientForm'|'RecipeList'|'IngredientList'>('RecipeForm');
 
   return (
     <div className="app-container">
@@ -14,19 +14,18 @@ export default function App() {
       {/* Navigation Header */}
       <nav className="navbar">
         <div className="nav-logo">
-          <ChefHat size={24} />
-          <span>RECIPE ENGINE</span>
+          <ChefHat size={24} /> RECIPE APP
         </div>
         <div className="nav-links">
           <button 
-            onClick={() => setActiveTab('recipe')}
-            className={activeTab === 'recipe' ? 'active' : ''}
+            onClick={() => setActiveTab('RecipeForm')}
+            className={activeTab === 'RecipeForm' ? 'active' : ''}
           >
             <Utensils size={18} /> Add a Recipe
           </button>
           <button 
-            onClick={() => setActiveTab('ingredient')}
-            className={activeTab === 'ingredient' ? 'active' : ''}
+            onClick={() => setActiveTab('IngredientForm')}
+            className={activeTab === 'IngredientForm' ? 'active' : ''}
           >
             <Utensils size={18} /> Add an Ingredient
           </button>
@@ -47,11 +46,11 @@ export default function App() {
 
       {/* 2. Content Area */}
       <main className="content-area">
-        {activeTab === 'recipe' && (
-          <RecipeForm onSaved={() => setActiveTab('recipe')} />
+        {activeTab === 'RecipeForm' && (
+          <RecipeForm />
         )}
-        {activeTab === 'ingredient' && (
-          <IngredientForm onSaved={() => setActiveTab('ingredient')} />
+        {activeTab === 'IngredientForm' && (
+          <IngredientForm />
         )}
         {activeTab === 'RecipeList' && (
           <RecipeList />

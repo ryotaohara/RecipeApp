@@ -10,13 +10,14 @@ export const IngredientList: React.FC = () => {
   }, []);
 
   return (
-    <div className="list">
+    <div className="form-stack">
       {recipes.length === 0 ? (
-        <p>No recipes saved yet.</p>
+        <p>No ingredients saved yet.</p>
       ) : (
         recipes.map((r: any) => (
           <div key={r.id} className="items">
             <strong>{r.name}</strong>
+            <span>{r.description}</span>
             <span>{r.calories_per_g}</span>
             <span>{r.price_per_g}</span>
           </div>

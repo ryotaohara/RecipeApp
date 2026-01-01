@@ -10,7 +10,7 @@ export const RecipeList: React.FC = () => {
   }, []);
 
   return (
-    <div className="list">
+    <div className="form-stack">
       {recipes.length === 0 ? (
         <p>No recipes saved yet.</p>
       ) : (

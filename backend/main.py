@@ -19,9 +19,9 @@ app = FastAPI(title="Recipe Engine API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # In production, replace with your specific domain
-    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=True,
 )
 
 # --- API Endpoints ---
@@ -38,12 +38,13 @@ def list_recipes(db: Session = Depends(get_db)):
 
 # Inserts a new recipe with the frontend inputs
 @app.post("/recipes/calculate", response_model=schemas.CalculationResponse)
-async def calculate_and_save_recipe(submission: schemas.RecipeIngredient, db: Session = Depends(get_db)):
+async def calculate_and_save_recipe(submission: schemas.RecipeSubmission, db: Session = Depends(get_db)):
     # 1. Database Phase: Create the Recipe Record
     new_recipe = models.Recipe(
         title     = submission.title,
         prep_time = submission.prep_time,
-        cook_time = submission.cook_time
+        cook_time = submission.cook_time,
+        steps     = submission.steps
     )
     db.add(new_recipe) # INSERT into the "recipes" table
     db.flush()  # This gets us the new_recipe.id without committing yet
@@ -73,25 +74,26 @@ async def calculate_and_save_recipe(submission: schemas.RecipeIngredient, db: Se
     
     return {
         "id": new_recipe.id,
-        "calories": round(total_calories, 1),
-        "price": round(total_price, 2),
-        "time": submission.prep_time + submission.cook_time
+        "total_calories": round(total_calories, 1),
+        "total_price": round(total_price, 2),
+        "total_time": submission.prep_time + submission.cook_time
     }
 
 # Adds an ingredient
 @app.post("/add_ingredients")
-async def add_ingredient(item: schemas.Ingredient, db: Session = Depends(get_db)):
-    new_ing  = models.Ingredient(
-        name  = item.name,
-        calories_per_g = item.calories_per_g,
-        price_per_g = item.price_per_g
+async def add_ingredient(submission: schemas.IngredientSubmission, db: Session = Depends(get_db)):
+    new_ing = models.Ingredient(
+        name           = submission.name,
+        description    = submission.description,
+        calories_per_g = submission.calories_per_g,
+        price_per_g    = submission.price_per_g
     )
     db.add(new_ing)
     db.commit()
 
+# Used by Kubernetes Liveness/Readiness probes
 @app.get("/health")
 def health_check():
-    """Used by Kubernetes Liveness/Readiness probes."""
     return {"status": "healthy"}
 
 if __name__ == "__main__":
