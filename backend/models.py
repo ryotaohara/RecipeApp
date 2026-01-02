@@ -24,3 +24,8 @@ class RecipeIngredient(Base):
     recipe_id     = Column(Integer, ForeignKey("recipes.id"), primary_key=True)     # Composite primary key
     ingredient_id = Column(Integer, ForeignKey("ingredients.id"), primary_key=True) # Composite primary key
     quantity      = Column(Float, nullable=False)
+
+class RecipeCategories(Base):
+    __tablename__ = "recipe_categories"
+    category_name        = Column(String, primary_key=True, nullable=False)
+    category_description = Column(String, nullable=True)
