@@ -18,26 +18,21 @@ app = FastAPI(title="Recipe Engine API")
 # Essential for your Mac to allow the Frontend (Port 5173) to talk to Python (Port 8000)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with your specific domain
+    allow_origins=["http://localhost:5173"],  # Frontend server with its port
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    allow_credentials=True,
 )
 
 # --- API Endpoints ---
 
-# Returns a list of ingredients for the dropdown on the frontend
-@app.get("/ingredients")
-def read_ingredients(db: Session = Depends(get_db)):
-    return db.query(models.Ingredient).all() # SELECT * from "ingredients"
-
 # Returns all recipes
 @app.get("/recipes")
 def list_recipes(db: Session = Depends(get_db)):
-    return db.query(models.Recipe).all()
+    return db.query(models.Recipe).all()        # SELECT * from "recipes"
 
-# Inserts a new recipe with the frontend inputs
-@app.post("/recipes/calculate", response_model=schemas.CalculationResponse)
+# Adds a new recipe
+@app.post("/recipes")
 async def calculate_and_save_recipe(submission: schemas.RecipeSubmission, db: Session = Depends(get_db)):
     # 1. Database Phase: Create the Recipe Record
     new_recipe = models.Recipe(
@@ -71,16 +66,15 @@ async def calculate_and_save_recipe(submission: schemas.RecipeSubmission, db: Se
 
     # 3. Commit the query
     db.commit() # Save everything to PostgreSQL
-    
-    return {
-        "id": new_recipe.id,
-        "total_calories": round(total_calories, 1),
-        "total_price": round(total_price, 2),
-        "total_time": submission.prep_time + submission.cook_time
-    }
+
+
+# Returns all ingredients
+@app.get("/ingredients")
+def read_ingredients(db: Session = Depends(get_db)):
+    return db.query(models.Ingredient).all()    # SELECT * from "ingredients"
 
 # Adds an ingredient
-@app.post("/add_ingredients")
+@app.post("/ingredients")
 async def add_ingredient(submission: schemas.IngredientSubmission, db: Session = Depends(get_db)):
     new_ing = models.Ingredient(
         name           = submission.name,

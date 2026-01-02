@@ -17,7 +17,7 @@ class Recipe(Base):
     title     = Column(String, nullable=False)
     prep_time = Column(Integer)
     cook_time = Column(Integer)
-    steps     = Column(String, nullable=False)
+    steps     = Column(String)
 
 class RecipeIngredient(Base):
     __tablename__ = "recipe_ingredients"
