@@ -135,3 +135,37 @@ textarea {
   border-radius: 8px;
   background: #f8fafc;
 }
+
+/* Table styling for "RecipeList" and "IngredientList" */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-header {
+  background-color: #e2e8f0;
+  font-weight: bold;
+}
+
+.table-header, .table-cell {
+  padding: 8px;
+  text-align: left;
+}
+
+/* Detail View Layout */
+
+.detail-header {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: center;
+}
+
+.detail-card {
+margin: 8px 16px 16px 16px;
+}
+
+.back-btn {
+  margin: 16px 16px;
+  text-align: right;
+}

@@ -143,7 +143,7 @@ export const RecipeForm = () => {
         </button>
       </div>
 
-      <button type="submit" className="add-btn">Save & Calculate
+      <button type="submit" className="add-btn">Save
       </button>
     </form>
   );

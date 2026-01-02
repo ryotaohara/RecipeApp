@@ -19,6 +19,6 @@ class RecipeSubmission(BaseModel):
 # Ingredient contract on "IngredientForm"
 class IngredientSubmission(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
-    description: str = Field(..., min_length=1, max_length=255)
+    description: str = Field(..., min_length=0, max_length=255)
     calories_per_g: int
     price_per_g: int

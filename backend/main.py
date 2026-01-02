@@ -85,6 +85,19 @@ async def add_ingredient(submission: schemas.IngredientSubmission, db: Session =
     db.add(new_ing)
     db.commit()
 
+@app.get("/recipes/{recipe_id}")
+def get_recipe_ingredients(recipe_id: int, db: Session = Depends(get_db)):
+    results = db.query(
+        models.RecipeIngredient.quantity,
+        models.RecipeIngredient.ingredient_id,
+        models.Ingredient.name
+    ).filter(
+        models.RecipeIngredient.recipe_id == recipe_id
+    ).join(
+        models.Ingredient, models.Ingredient.id == models.RecipeIngredient.ingredient_id
+    ).all()
+    return [{"name": r.name, "quantity": r.quantity, "ingredient_id": r.ingredient_id} for r in results]
+
 # Used by Kubernetes Liveness/Readiness probes
 @app.get("/health")
 def health_check():
