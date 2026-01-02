@@ -1,27 +1,20 @@
-# This script enforces data contracts of input from the frontend based on "pydantic"
+# This script enforces data contracts/models of input from the frontend based on "pydantic"
 
 from pydantic import BaseModel, Field
 from typing import List
 
+# Ingredient contract on the below "RecipeSubmission" class
 class RecipeIngredientItem(BaseModel):
     ingredient_id: int
     quantity: float = Field(..., gt=0)
 
-# Ingredient contract on "RecipeForm"
+# Recipe contract on "RecipeForm"
 class RecipeSubmission(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
     prep_time: int = Field(..., ge=0)
     cook_time: int = Field(..., ge=0)
     steps: str = Field(..., min_length=1, max_length=1000)
     ingredients: List[RecipeIngredientItem]
-
-class CalculationResponse(BaseModel):
-    id: int
-    calories: float
-    price: float
-
-    class Config:
-        from_attributes = True
 
 # Ingredient contract on "IngredientForm"
 class IngredientSubmission(BaseModel):

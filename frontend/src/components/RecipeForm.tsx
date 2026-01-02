@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2} from 'lucide-react';
-import { type IngredientOption } from '../types';
 
 export const RecipeForm = () => {
   const [rows, setRows] = useState([{ ingredient_id: 0, quantity: 0 }]);
@@ -8,7 +7,7 @@ export const RecipeForm = () => {
   const [prepTime, setPrepTime] = useState(0);
   const [cookTime, setCookTime] = useState(0);
   const [steps, setSteps] = useState('');
-  const [availableIngredients, setAvailableIngredients] = useState<IngredientOption[]>([]);
+  const [availableIngredients, setAvailableIngredients] = useState([]);
 
   useEffect(() => {
     fetch('http://localhost:8000/ingredients')
@@ -34,14 +33,14 @@ export const RecipeForm = () => {
     }
 
     try {
-      const res = await fetch('http://localhost:8000/recipes/calculate', {
+      const res = await fetch('http://localhost:8000/recipes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       
       if (res.ok) {
-        alert("Recipe Saved and Calculated!");
+        alert("Recipe Saved!");
       } else {
         alert("Backend error. Check your terminal.");
       }
@@ -87,7 +86,7 @@ export const RecipeForm = () => {
       {/* Steps */}
       <div className="input-group">
         <label className="input-title">Steps</label>
-        <input
+        <textarea
           className="input-box"
           placeholder="e.g. 1. Dice tomatoes &#10; 2. Add olive oil"
           value={steps}
@@ -112,7 +111,7 @@ export const RecipeForm = () => {
             >
               <option value="0">Choose Ingredient...</option>
               {availableIngredients.map(ing => (
-                <option key={ing.id} value={ing.id}>{ing.name}</option>
+                <option key={ing["id"]} value={ing["id"]}>{ing["name"]}</option>
               ))}
             </select>
             <input 
